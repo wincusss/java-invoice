@@ -2,6 +2,8 @@ package pl.edu.agh.mwo.invoice.product;
 
 import java.math.BigDecimal;
 
+import static java.math.BigDecimal.ZERO;
+
 public abstract class Product {
     private final String name;
 
@@ -11,6 +13,16 @@ public abstract class Product {
 
 
     protected Product(String name, BigDecimal price, BigDecimal tax) {
+        if (name==null || name.isEmpty()) {
+            throw new IllegalArgumentException("Name of the product cannot be null or empty");
+        }
+        else if ((price == null) || price.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Price cannot be null or empty");
+        }
+        //else if (tax.) {
+        //    throw new IllegalArgumentException("Price cannot be null or empty");
+        //}
+
         this.name = name;
         this.price = price;
         this.taxPercent = tax;
