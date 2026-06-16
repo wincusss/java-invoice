@@ -1,57 +1,85 @@
 package pl.edu.agh.mwo.invoice;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import pl.edu.agh.mwo.invoice.product.Product;
 
 public class Invoice {
-    private Map<Product, Integer> products = new HashMap<Product, Integer>();
+    private Map<Product, Integer> products =
+            new HashMap<>();
 
-    public void addProduct(Product product) {
-        addProduct(product, 1);
-    }
-
-    public void addProduct(Product product, Integer quantity) {
-        if (product == null || quantity <= 0) {
-            throw new IllegalArgumentException();
-        }
-        products.put(product, quantity);
-    }
-
-    public BigDecimal getNetTotal() {
-        BigDecimal totalNet = BigDecimal.ZERO;
-        for (Product product : products.keySet()) {
-            BigDecimal quantity = new BigDecimal(products.get(product));
-            totalNet = totalNet.add(product.getPrice().multiply(quantity));
-        }
-        return totalNet;
-    }
-
-    public BigDecimal getTaxTotal() {
-        return getGrossTotal().subtract(getNetTotal());
-    }
-
-    public BigDecimal getGrossTotal() {
-        BigDecimal totalGross = BigDecimal.ZERO;
-        for (Product product : products.keySet()) {
-            BigDecimal quantity = new BigDecimal(products.get(product));
-            totalGross = totalGross.add(product.getPriceWithTax().multiply(quantity));
-        }
-        return totalGross;
-    }
-
-    static int NUMBER = 0;
-    private int number;
+    private static int invoiceNumberNext = 1;
+    private int invoiceNumber;
 
     public Invoice() {
-        this.number = NUMBER++;
+        this.invoiceNumber = invoiceNumberNext++;
     }
 
-    public int getNumber() {
+    public int getInvoiceNumber() {
+        return invoiceNumber;
+    }
 
-        return number;
+    public void addProduct(Product product) {
+
+        this.addProduct(product, 1);
+    }
+    public void addProduct(Product product, Integer quantity) {
+        if (quantity<=0 ) {
+            throw new IllegalArgumentException("Quantity of products cannot be less or equal 0");
+        }
+        else if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+
+        this.products.put(product, quantity);
+    }
+
+
+    public BigDecimal getSubtotal() {
+        BigDecimal value = BigDecimal.ZERO;
+        for (Product product : this.products.keySet()) {
+            Integer quantity = this.products.get(product);
+            BigDecimal price = product.getPrice();
+            price = price.multiply(BigDecimal.valueOf(quantity));
+            value = value.add(price);
+        }
+        return value;
+
+    }
+
+    public BigDecimal getTax() {
+
+        return getTotal().subtract(getSubtotal());
+
+    }
+
+    public String getProductList() {
+        String productList = "Numer faktury: " + invoiceNumber + "\n";
+
+        for (Product product : products.keySet()) {
+            productList += product.getName() + "," + products.get(product) + ", " + product.getPrice() + "\n";
+        }
+        productList += "Liczba pozycji: " + products.size();
+
+        return productList;
+    }
+
+    public BigDecimal getTotal() {
+        BigDecimal value = BigDecimal.ZERO;
+        for (Product product : this.products.keySet()) {
+            Integer quantity = this.products.get(product);
+            BigDecimal price = product.getPriceWithTax(); //.subtract(product.getTaxPercent()/100.0);  //.multiply(new BigDecimal("0.01")));
+            price = price.multiply(BigDecimal.valueOf(quantity)); //.setScale(2, RoundingMode.HALF_UP);
+            System.out.println("price aft round");
+            System.out.println(price);
+            System.out.println(product);
+            value = value.add(price);
+        }
+        return value;
     }
 }
