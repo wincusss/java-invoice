@@ -13,6 +13,16 @@ public class Invoice {
     private Map<Product, Integer> products =
             new HashMap<>();
 
+    private static int invoiceNumberNext = 1;
+    private int invoiceNumber;
+
+    public Invoice() {
+        this.invoiceNumber = invoiceNumberNext++;
+    }
+
+    public int getInvoiceNumber() {
+        return invoiceNumber;
+    }
 
     public void addProduct(Product product) {
 
@@ -46,6 +56,17 @@ public class Invoice {
 
         return getTotal().subtract(getSubtotal());
 
+    }
+
+    public String getProductList() {
+        String productList = "Numer faktury: " + invoiceNumber + "\n";
+
+        for (Product product : products.keySet()) {
+            productList += product.getName() + "," + products.get(product) + ", " + product.getPrice() + "\n";
+        }
+        productList += "Liczba pozycji: " + products.size();
+
+        return productList;
     }
 
     public BigDecimal getTotal() {

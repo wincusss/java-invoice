@@ -125,4 +125,30 @@ public class InvoiceTest {
     public void testAddingNullProduct() {
         invoice.addProduct(null);
     }
+
+    @Test
+    public void testProductListContainsInvoiceNumber() {
+        invoice.addProduct(new TaxFreeProduct("Chleb", new BigDecimal("5")), 2);
+
+        String productList = invoice.getProductList();
+
+        Assert.assertTrue(productList.contains("Numer faktury: " + invoice.getInvoiceNumber()));
+    }
+
+    @Test
+    public void testProductListContainsProductNameQuantityAndPrice() {
+        invoice.addProduct(new TaxFreeProduct("Chleb", new BigDecimal("5")), 2);
+        String productList = invoice.getProductList();
+        Assert.assertTrue(productList.contains("Chleb"));
+        Assert.assertTrue(productList.contains("2"));
+        Assert.assertTrue(productList.contains("5"));
+    }
+
+    @Test
+    public void testProductListContainsNumberOfPositions() {
+        invoice.addProduct(new TaxFreeProduct("Chleb", new BigDecimal("5")), 2);
+        invoice.addProduct(new DairyProduct("Pinezka", new BigDecimal("10")), 3);
+        String productList = invoice.getProductList();
+        Assert.assertTrue(productList.contains("Liczba pozycji: 2"));
+    }
 }
